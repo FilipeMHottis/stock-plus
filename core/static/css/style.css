@@ -1,0 +1,42 @@
+/* Fundo escuro padrão */
+body {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #4B0082; /* Roxo */
+}
+
+/* Links da navbar */
+.navbar .nav-link {
+    color: #ffffff;
+    transition: color 0.2s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+    color: #d1b3ff; /* Roxo claro */
+}
+
+/* Botão de logout como link */
+.navbar .nav-item button {
+    border: none;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.navbar .nav-item button:hover {
+    color: #d1b3ff;
+}
+
+/* Container da Home */
+main.container {
+    margin-top: 2rem;
+}
+
+/* Títulos */
+h1, h3 {
+    color: #ffffff;
+}
