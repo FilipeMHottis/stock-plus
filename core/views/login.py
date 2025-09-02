@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.http import HttpRequest
 
 
-def custom_login_view(request):
+def custom_login_view(request: HttpRequest):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -18,6 +19,11 @@ def custom_login_view(request):
 
             return redirect("home")
         else:
-            return render(request, "login.html", {"error": "Usuário ou senha inválidos"})
+            return render(
+                request,
+                "login.html",
+                {"error": "Usuário ou senha inválidos"},
+                status=401,
+            )
 
     return render(request, "login.html")
