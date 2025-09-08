@@ -1,51 +1,51 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 
-{% block title %}Perfil do Usuário - Stock Plus{% endblock %}
+    {% block title %}Perfil do Usuário - Stock Plus{% endblock %}
 
-{% block content %}
+    {% block content %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
-{% endif %}
-
-
-<div class="card shadow-lg p-4 mx-auto text-light" style="max-width: 600px; border-radius: 15px; margin-top: 50px;">
-    <h2 class="mb-4 text-center">👤 Perfil do Usuário</h2>
-    <form method="post">
-        {% csrf_token %}
-
-        <!-- Username -->
-        <div class="mb-3">
-            <label for="username" class="form-label"><i class="fas fa-user me-2"></i>Nome de Usuário</label>
-            <input type="text" class="form-control rounded-pill" id="username" name="username" value="{{ user.username }}" required>
-        </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
 
-        <!-- Email -->
-        <div class="mb-3">
-            <label for="email" class="form-label"><i class="fas fa-envelope me-2"></i>E-mail</label>
-            <input type="email" class="form-control rounded-pill" id="email" name="email" value="{{ user.email }}">
-        </div>
+    <div class="card shadow-lg p-4 mx-auto text-light" style="max-width: 600px; border-radius: 15px; margin-top: 50px;">
+        <h2 class="mb-4 text-center">👤 Perfil do Usuário</h2>
+        <form method="post">
+            {% csrf_token %}
 
-        <!-- Password -->
-        <div class="mb-3">
-            <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Senha</label>
-            <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Deixe em branco para manter a senha atual">  
-        </div>
+            <!-- Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label"><i class="fas fa-user me-2"></i>Nome de Usuário</label>
+                <input type="text" class="form-control rounded-pill" id="username" name="username" value="{{ user.username }}" required>
+            </div>
 
-        <div class="mb-3">
-            <label for="confirm_password" class="form-label"><i class="fas fa-lock me-2"></i>Confirmar Senha</label>
-            <input type="password" class="form-control rounded-pill" id="confirm_password" name="confirm_password" placeholder="Digite a senha novamente">
-        </div>
 
-        <div class="d-grid">
-            <button type="submit" class="btn" style="background-color: #4B0082; border-color: #4B0082; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">💾 Atualizar</button>
-        </div>
-    </form>
-</div>
-{% endblock %}
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label"><i class="fas fa-envelope me-2"></i>E-mail</label>
+                <input type="email" class="form-control rounded-pill" id="email" name="email" value="{{ user.email }}">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Senha</label>
+                <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Deixe em branco para manter a senha atual">  
+            </div>
+
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label"><i class="fas fa-lock me-2"></i>Confirmar Senha</label>
+                <input type="password" class="form-control rounded-pill" id="confirm_password" name="confirm_password" placeholder="Digite a senha novamente">
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn" style="background-color: #4B0082; border-color: #4B0082; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">💾 Atualizar</button>
+            </div>
+        </form>
+    </div>
+    {% endblock %}
