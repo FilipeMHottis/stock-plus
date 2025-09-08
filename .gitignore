@@ -1,2 +1,13 @@
+# Ambiente virtual
+.venv/
 venv/
+
+# Banco de dados local
 db.sqlite3
+
+# Cache do Python
+__pycache__/
+*.pyc
+
+# Configs do VSCode (se usar)
+.vscode/
