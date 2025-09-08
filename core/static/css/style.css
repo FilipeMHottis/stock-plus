@@ -1,42 +1,96 @@
-/* Fundo escuro padrão */
-body {
-    background-color: #121212;
-    color: #ffffff;
+/* Geral */
+html, body {
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Navbar */
-.navbar {
-    background-color: #4B0082; /* Roxo */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-/* Links da navbar */
-.navbar .nav-link {
-    color: #ffffff;
-    transition: color 0.2s ease-in-out;
+.navbar-nav .nav-item {
+    display: flex;
+    align-items: center;
 }
 
-.navbar .nav-link:hover {
-    color: #d1b3ff; /* Roxo claro */
+.navbar-nav .nav-item form {
+    margin: 0;
 }
 
-/* Botão de logout como link */
-.navbar .nav-item button {
-    border: none;
-    background: none;
-    color: #fff;
-    cursor: pointer;
-}
-
-.navbar .nav-item button:hover {
-    color: #d1b3ff;
-}
-
-/* Container da Home */
+/* Conteúdo responsivo */
 main.container {
-    margin-top: 2rem;
+    padding: 1rem;
+    text-align: center;
 }
 
-/* Títulos */
-h1, h3 {
-    color: #ffffff;
+/* Mobile (telas pequenas até 576px) */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+    }
+
+    main.container {
+        margin-top: 2rem;
+        font-size: 1rem;
+    }
+
+    button, input, select {
+        font-size: 1rem;
+    }
+}
+
+/* Tablets (até 768px) */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    main.container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+    }
+}
+
+.navbar {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.nav-link {
+    transition: color 0.3s ease, transform 0.2s ease;
+    color: #f8f9fa;
+}
+
+.nav-link:hover {
+    color: #FFD700;
+    transform: scale(1.05);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-shadow: 1px 1px 2px black;
+}
+
+.navbar-collapse {
+    background-color: #3a006d; /* tom mais escuro do roxo */
+    padding: 1rem;
+    border-radius: 0.5rem;
 }
