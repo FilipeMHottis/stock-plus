@@ -1,0 +1,38 @@
+<form method="post" id="customerForm">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="id_name" class="form-label">Nome</label>
+        <input type="text" name="name" maxlength="150" class="form-control" id="id_name"
+               value="{{ customer.name|default_if_none:'' }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="id_trade_name" class="form-label">Nome Fantasia</label>
+        <input type="text" name="trade_name" maxlength="150" class="form-control" id="id_trade_name"
+               value="{{ customer.trade_name|default_if_none:'' }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="id_phone" class="form-label">Telefone</label>
+        <input type="text" name="phone" maxlength="20" class="form-control" id="id_phone"
+               value="{{ customer.phone|default_if_none:'' }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="id_email" class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" id="id_email"
+               value="{{ customer.email|default_if_none:'' }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="id_address" class="form-label">Endereço</label>
+        <textarea name="address" class="form-control" id="id_address" rows="3">{{ customer.address|default_if_none:'' }}</textarea>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-success">
+            {% if customer %}Atualizar{% else %}Salvar{% endif %}
+        </button>
+    </div>
+</form>

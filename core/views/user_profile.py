@@ -27,7 +27,7 @@ def user_profile(request: HttpRequest):
         if password:
             if password == confirm_password:
                 try:
-                    validate_password(password, user)  # 🚨 Valida aqui
+                    validate_password(password, user)
                     user.set_password(password)
                 except ValidationError as e:
                     messages.error(
