@@ -32,6 +32,11 @@
             <input type="email" class="form-control rounded-pill" id="email" name="email" value="{{ user.email }}">
         </div>
 
+        <div class="mb-3">
+            <label for="role" class="form-label"><i class="fas fa-id-badge me-2"></i>Função</label>
+            <input type="text" class="form-control rounded-pill" id="role" disabled name="role" value="{{ user.role }}" readonly>
+        </div>
+
         <!-- Password -->
         <div class="mb-3 position-relative">
             <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Senha</label>
