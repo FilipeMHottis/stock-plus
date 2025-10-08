@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Customer - Stock Plus{% endblock %}
+{% block title %}Clientes - Stock Plus{% endblock %}
 
 {% block content %}
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2>Customers</h2>
+        <h2>Clientes</h2>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customerModal" data-mode="create">
-            ➕ Add Customer
+            ➕ Adicionar Cliente
         </button>
     </div>
 
@@ -16,9 +16,9 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
+                    <th>Nome</th>
                     <th>Email</th>
-                    <th>Phone</th>
+                    <th>Telefone</th>
                     <th>Ação</th>
                 </tr>
             </thead>
@@ -40,7 +40,7 @@
                                 data-phone="{{ customer.phone }}"
                                 data-email="{{ customer.email }}"
                                 data-address="{{ customer.address }}">
-                            ✏️ Edit
+                            ✏️ Editar
                         </button>
 
                         <button class="btn btn-sm btn-danger"
@@ -48,13 +48,13 @@
                                 data-bs-target="#deleteModal"
                                 data-id="{{ customer.id }}"
                                 data-name="{{ customer.name }}">
-                            🗑️ Delete
+                            🗑️ Deletar
                         </button>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">No customers found.</td>
+                    <td colspan="5">Nenhum cliente encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -68,36 +68,7 @@
         <div class="modal-content">
             <form method="post" id="customerForm">
                 {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customerModalLabel">Novo Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="id" id="form-id">
-                    <div class="mb-3">
-                        <label for="form-name" class="form-label">Nome</label>
-                        <input type="text" name="name" class="form-control" id="form-name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="form-trade" class="form-label">Nome Fantasia</label>
-                        <input type="text" name="trade_name" class="form-control" id="form-trade">
-                    </div>
-                    <div class="mb-3">
-                        <label for="form-phone" class="form-label">Telefone</label>
-                        <input type="text" name="phone" class="form-control" id="form-phone" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="form-email" class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" id="form-email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="form-address" class="form-label">Endereço</label>
-                        <textarea name="address" class="form-control" id="form-address" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Salvar</button>
-                </div>
+                {% include 'customer_form.html' %}
             </form>
         </div>
     </div>
@@ -136,10 +107,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const mode = button.getAttribute('data-mode');
         const modalTitle = customerModal.querySelector('.modal-title');
         const form = customerModal.querySelector('form');
+        const submitButton = document.getElementById('submit-button');
 
         if (mode === 'edit') {
+            {% comment %} Modo de edição {% endcomment %}
             modalTitle.textContent = 'Editar Cliente';
             form.action = `/customers/update/${button.dataset.id}/`;
+            submitButton.textContent = 'Atualizar';
+
+            {% comment %} Preencher o formulário com os dados do cliente {% endcomment %}
             document.getElementById('form-id').value = button.dataset.id;
             document.getElementById('form-name').value = button.dataset.name;
             document.getElementById('form-trade').value = button.dataset.trade;
@@ -147,9 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('form-email').value = button.dataset.email;
             document.getElementById('form-address').value = button.dataset.address;
         } else {
+            {% comment %} Modo de criação {% endcomment %}
             modalTitle.textContent = 'Novo Cliente';
             form.action = '/customers/create/';
+            submitButton.textContent = 'Salvar';
+
+            {% comment %} Limpar o formulário {% endcomment %}
             form.reset();
+            document.getElementById('form-id').value = '';
         }
     });
 

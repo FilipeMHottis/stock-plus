@@ -1,14 +1,21 @@
 from django.urls import path
-from .views.login import custom_login_view
-from .views.home import home
+from .views.login_view import custom_login_view
+from .views.home_view import home
 from .views.logout import custom_logout_view
-from .views.user_profile import user_profile
+from .views.user_profile_view import user_profile
 from .views.customer_views import (
     customer,
     customer_create,
     customer_update,
     customer_delete,
 )
+from .views.tag_view import (
+    tag,
+    tag_create,
+    tag_update,
+    tag_delete,
+)
+
 
 urlpatterns = [
     path(
@@ -50,5 +57,25 @@ urlpatterns = [
         "customers/delete/<int:id>/",
         customer_delete,
         name="customer_delete",
+    ),
+    path(
+        "tags/",
+        tag,
+        name="tag",
+    ),
+    path(
+        "tags/create/",
+        tag_create,
+        name="tag_create",
+    ),
+    path(
+        "tags/update/<int:id>/",
+        tag_update,
+        name="tag_update",
+    ),
+    path(
+        "tags/delete/<int:id>/",
+        tag_delete,
+        name="tag_delete",
     ),
 ]

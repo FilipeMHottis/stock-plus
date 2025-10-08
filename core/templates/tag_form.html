@@ -1,0 +1,27 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="tagModalLabel">Nova Tag</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+</div>
+
+<div class="modal-body">
+    <input type="hidden" name="id" id="form-id">
+    <div class="mb-3">
+        <label for="form-name" class="form-label">Nome</label>
+        <input type="text" name="name" class="form-control" id="form-name" required>
+    </div>
+
+        <div class="mb-3">
+            <label for="form-color" class="form-label fw-semibold">
+                <i class="bi bi-palette me-1"></i> Cor da Tag
+            </label>
+            <div class="input-group">
+                <input type="color" name="color" class="form-control form-control-color p-1" id="form-color" required>
+                <input type="text" class="form-control shadow-sm" id="form-color-hex" placeholder="#ffffff" maxlength="7">
+            </div>
+            <div class="form-text">Escolha uma cor ou insira o código HEX manualmente.</div>
+        </div>
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success" id="submit-button">Salvar</button>
+</div>
