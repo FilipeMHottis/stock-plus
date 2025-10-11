@@ -45,4 +45,4 @@ def user_profile(request: HttpRequest):
         user.save()
         return redirect("user_profile")
 
-    return render(request, "user_profile.html", {"user": user})
+    return render(request, "user/user_profile.html", {"user": user})

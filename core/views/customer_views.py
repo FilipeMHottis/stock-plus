@@ -9,7 +9,7 @@ from django.http import HttpRequest
 @login_required
 def customer(request: HttpRequest):
     customers = Customer.objects.all()
-    return render(request, "customer.html", {"customers": customers})
+    return render(request, "customer/customer.html", {"customers": customers})
 
 
 @role_required(["admin", "checkout"])

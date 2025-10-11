@@ -9,7 +9,7 @@ from django.http import HttpRequest
 @login_required
 def tag(request: HttpRequest):
     tags = Tag.objects.all()
-    return render(request, "tag.html", {"tags": tags})
+    return render(request, "tag/tag.html", {"tags": tags})
 
 
 @role_required(["admin", "checkout"])

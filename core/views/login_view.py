@@ -26,4 +26,4 @@ def custom_login_view(request: HttpRequest):
                 status=401,
             )
 
-    return render(request, "login.html")
+    return render(request, "login/login.html")

@@ -15,6 +15,12 @@ from .views.tag_view import (
     tag_update,
     tag_delete,
 )
+from .views.category_view import (
+    category,
+    category_create,
+    category_update,
+    category_delete,
+)
 
 
 urlpatterns = [
@@ -77,5 +83,25 @@ urlpatterns = [
         "tags/delete/<int:id>/",
         tag_delete,
         name="tag_delete",
+    ),
+    path(
+        "categories/",
+        category,
+        name="category",
+    ),
+    path(
+        "categories/create/",
+        category_create,
+        name="category_create",
+    ),
+    path(
+        "categories/update/<int:category_id>/",
+        category_update,
+        name="category_update",
+    ),
+    path(
+        "categories/delete/<int:category_id>/",
+        category_delete,
+        name="category_delete",
     ),
 ]
