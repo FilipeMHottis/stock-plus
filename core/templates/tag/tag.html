@@ -1,27 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Tag - Stock Plus{% endblock %}
+{% block title %}Tags - Stock Plus{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h2>Tags</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagModal" data-mode="create">
-            ➕ Adicionar Tag
+<div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-purple text-white">
+        <h2 class="mb-0">Tags</h2>
+        <button class="btn btn-light text-purple fw-bold" data-bs-toggle="modal" data-bs-target="#tagModal" data-mode="create">
+            ➕ Nova Tag
         </button>
     </div>
 
-    <div class="card-body">
-        <table class="table table-striped">
-            <thead>
+    <div class="card-body bg-dark text-light">
+        <table class="table table-dark table-striped table-hover align-middle rounded-3 overflow-hidden">
+            <thead class="bg-purple text-white">
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Cor</th>
-                    <th>Ação</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
-            
             <tbody>
                 {% for tag in tags %}
                 <tr>
@@ -34,31 +33,29 @@
                     </td>
                     <td>
                         <button 
-                            class="btn btn-sm btn-primary"
+                            class="btn btn-sm btn-outline-warning text-white"
                             data-bs-toggle="modal"
                             data-bs-target="#tagModal"
                             data-mode="edit"
                             data-id="{{ tag.id }}"
                             data-name="{{ tag.name }}"
-                            data-color="{{ tag.color }}"
-                        >
+                            data-color="{{ tag.color }}">
                             ✏️ Editar
                         </button>
                         <button
-                            class="btn btn-sm btn-danger"
+                            class="btn btn-sm btn-outline-danger"
                             data-bs-toggle="modal"
                             data-bs-target="#deleteModal"
                             data-id="{{ tag.id }}"
                             data-name="{{ tag.name }}"
-                            data-color="{{ tag.color }}"
-                        >
-                            🗑️ Deletar
+                            data-color="{{ tag.color }}">
+                            🗑️
                         </button>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4">Nenhuma tag encontrada.</td>
+                    <td colspan="4" class="text-center text-muted">Nenhuma tag encontrada.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -69,7 +66,7 @@
 <!-- Modal de Adição/Edição -->
 <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-dark text-light">
             <form method="post" id="tagForm">
                 {% csrf_token %}
                 {% include 'tag/tag_form.html' %}
@@ -78,13 +75,13 @@
     </div>
 </div>
 
-<!-- Tag Modal de Exclusão -->
+<!-- Modal de Exclusão -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Excluir Tag</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 Tem certeza de que deseja excluir esta tag?

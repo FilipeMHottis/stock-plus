@@ -11,9 +11,24 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block head %}{% endblock %}
 </head>
+
+<style>
+    .bg-purple {
+        background-color: #4B0082 !important;
+    }
+    .text-purple {
+        color: #4B0082 !important;
+    }
+    input:disabled {
+        background-color: #2e2e2e !important;
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+</style>
+
 <body class="bg-secondary-subtle text-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg" style="background-color: #4B0082;">
+    <nav class="navbar navbar-expand-lg bg-purple">
         <div class="container">
             <a class="navbar-brand" href="/">📦 Stock Plus</a>
 
@@ -25,7 +40,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="/">🛒 Vendas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/">🗳️ Produtos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">🗳️ Produtos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'category' %}">📂 Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'tag' %}">🏷️ Tags</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'customer' %}">👥 Clientes</a></li>

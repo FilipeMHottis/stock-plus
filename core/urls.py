@@ -3,7 +3,9 @@ from .views.login_view import custom_login_view
 from .views.home_view import home
 from .views.logout import custom_logout_view
 from .views.user_profile_view import user_profile
-from .views.customer_views import (
+from django.conf import settings
+from django.conf.urls.static import static
+from .views.customer_view import (
     customer,
     customer_create,
     customer_update,
@@ -20,6 +22,12 @@ from .views.category_view import (
     category_create,
     category_update,
     category_delete,
+)
+from .views.product_view import (
+    product,
+    product_create,
+    product_update,
+    product_delete,
 )
 
 
@@ -104,4 +112,30 @@ urlpatterns = [
         category_delete,
         name="category_delete",
     ),
+    path(
+        "products/",
+        product,
+        name="product",
+    ),
+    path(
+        "products/create/",
+        product_create,
+        name="product_create",
+    ),
+    path(
+        "products/update/<int:product_id>/",
+        product_update,
+        name="product_update",
+    ),
+    path(
+        "products/delete/<int:product_id>/",
+        product_delete,
+        name="product_delete",
+    ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )

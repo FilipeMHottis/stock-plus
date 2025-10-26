@@ -3,23 +3,23 @@
 {% block title %}Clientes - Stock Plus{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h2>Clientes</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customerModal" data-mode="create">
+<div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-purple text-white">
+        <h2 class="mb-0">Clientes</h2>
+        <button class="btn btn-light text-purple fw-bold" data-bs-toggle="modal" data-bs-target="#customerModal" data-mode="create">
             ➕ Adicionar Cliente
         </button>
     </div>
 
-    <div class="card-body">
-        <table class="table table-striped">
-            <thead>
+    <div class="card-body bg-dark text-light">
+        <table class="table table-dark table-striped table-hover align-middle rounded-3 overflow-hidden">
+            <thead class="bg-purple text-white">
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Email</th>
                     <th>Telefone</th>
-                    <th>Ação</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@
                     <td>{{ customer.email }}</td>
                     <td>{{ customer.phone }}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary"
+                        <button class="btn btn-sm btn-outline-warning text-white"
                                 data-bs-toggle="modal"
                                 data-bs-target="#customerModal"
                                 data-mode="edit"
@@ -42,19 +42,18 @@
                                 data-address="{{ customer.address }}">
                             ✏️ Editar
                         </button>
-
-                        <button class="btn btn-sm btn-danger"
+                        <button class="btn btn-sm btn-outline-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                                 data-id="{{ customer.id }}"
                                 data-name="{{ customer.name }}">
-                            🗑️ Deletar
+                            🗑️
                         </button>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">Nenhum cliente encontrado.</td>
+                    <td colspan="5" class="text-center text-muted">Nenhum cliente encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -65,7 +64,11 @@
 <!-- Modal de Adição/Edição -->
 <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title" id="customerModalLabel">Novo Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
             <form method="post" id="customerForm">
                 {% csrf_token %}
                 {% include 'customer/customer_form.html' %}
@@ -77,13 +80,13 @@
 <!-- Modal de Confirmação de Exclusão -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
             <form method="post" id="deleteForm">
                 {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
                 <div class="modal-body">
                     <input type="hidden" name="id" id="delete-id">
                     <p>Tem certeza que deseja excluir o cliente <strong id="delete-name"></strong>?</p>
@@ -110,12 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitButton = document.getElementById('submit-button');
 
         if (mode === 'edit') {
-            {% comment %} Modo de edição {% endcomment %}
             modalTitle.textContent = 'Editar Cliente';
             form.action = `/customers/update/${button.dataset.id}/`;
             submitButton.textContent = 'Atualizar';
 
-            {% comment %} Preencher o formulário com os dados do cliente {% endcomment %}
             document.getElementById('form-id').value = button.dataset.id;
             document.getElementById('form-name').value = button.dataset.name;
             document.getElementById('form-trade').value = button.dataset.trade;
@@ -123,12 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('form-email').value = button.dataset.email;
             document.getElementById('form-address').value = button.dataset.address;
         } else {
-            {% comment %} Modo de criação {% endcomment %}
             modalTitle.textContent = 'Novo Cliente';
             form.action = '/customers/create/';
             submitButton.textContent = 'Salvar';
 
-            {% comment %} Limpar o formulário {% endcomment %}
             form.reset();
             document.getElementById('form-id').value = '';
         }

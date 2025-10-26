@@ -22,10 +22,10 @@ def category_create(request: HttpRequest):
     if request.method == "POST":
         name = request.POST.get("name")
         price_tier_1 = request.POST.get("price_tier_1")
-        price_tier_2 = request.POST.get("price_tier_2")
-        price_tier_3 = request.POST.get("price_tier_3")
-        quantity_limit_1 = request.POST.get("quantity_limit_1")
-        quantity_limit_2 = request.POST.get("quantity_limit_2")
+        price_tier_2 = request.POST.get("price_tier_2") or None
+        price_tier_3 = request.POST.get("price_tier_3") or None
+        quantity_limit_1 = request.POST.get("quantity_limit_1") or None
+        quantity_limit_2 = request.POST.get("quantity_limit_2") or None
 
         if not name or not price_tier_1:
             messages.error(
@@ -35,13 +35,14 @@ def category_create(request: HttpRequest):
             return redirect("category")
 
         Category.objects.create(
-            name=name,
+            name=name.strip(),
             price_tier_1=price_tier_1,
             price_tier_2=price_tier_2,
             price_tier_3=price_tier_3,
             quantity_limit_1=quantity_limit_1,
             quantity_limit_2=quantity_limit_2,
         )
+
         messages.success(request, "Categoria criada com sucesso.")
     return redirect("category")
 
@@ -54,10 +55,10 @@ def category_update(request: HttpRequest, category_id: int):
     if request.method == "POST":
         name = request.POST.get("name")
         price_tier_1 = request.POST.get("price_tier_1")
-        price_tier_2 = request.POST.get("price_tier_2")
-        price_tier_3 = request.POST.get("price_tier_3")
-        quantity_limit_1 = request.POST.get("quantity_limit_1")
-        quantity_limit_2 = request.POST.get("quantity_limit_2")
+        price_tier_2 = request.POST.get("price_tier_2") or None
+        price_tier_3 = request.POST.get("price_tier_3") or None
+        quantity_limit_1 = request.POST.get("quantity_limit_1") or None
+        quantity_limit_2 = request.POST.get("quantity_limit_2") or None
 
         if not name or not price_tier_1:
             messages.error(
@@ -66,13 +67,14 @@ def category_update(request: HttpRequest, category_id: int):
             )
             return redirect("category")
 
-        category.name = name
+        category.name = name.strip()
         category.price_tier_1 = price_tier_1
         category.price_tier_2 = price_tier_2
         category.price_tier_3 = price_tier_3
         category.quantity_limit_1 = quantity_limit_1
         category.quantity_limit_2 = quantity_limit_2
         category.save()
+
         messages.success(request, "Categoria editada com sucesso.")
     return redirect("category")
 

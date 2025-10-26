@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}Categories - Stock Plus{% endblock %}
+{% block title %}Categorias - Stock Plus{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h2>Categories</h2>
+<div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-purple text-white">
+        <h2 class="mb-0">Categorias</h2>
 
-        {% if user.role in "manager admin" %}
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal" data-mode="create">
-            ➕ Adicionar Categoria
+        {% if user.role == "manager" or user.role == "admin" %}
+        <button class="btn btn-light text-purple fw-bold" data-bs-toggle="modal" data-bs-target="#categoryModal" data-mode="create">
+            ➕ Nova Categoria
         </button>
         {% endif %}
     </div>
 
-    <div class="card-body">
-        <table class="table table-striped align-middle">
-            <thead>
+    <div class="card-body bg-dark text-light">
+        <table class="table table-dark table-striped table-hover align-middle rounded-3 overflow-hidden">
+            <thead class="bg-purple text-white">
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
-                    <th>Faixa de Preço 1</th>
-                    <th>Faixa de Preço 2</th>
-                    <th>Faixa de Preço 3</th>
+                    <th>Faixa 1</th>
+                    <th>Faixa 2</th>
+                    <th>Faixa 3</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -36,7 +36,7 @@
                     <td>{% if category.price_tier_3 %}R$ {{ category.price_tier_3 }}{% else %}-{% endif %}</td>
                     <td>
                         <button 
-                            class="btn btn-sm btn-info"
+                            class="btn btn-sm btn-outline-info"
                             data-bs-toggle="modal"
                             data-bs-target="#detailsModal"
                             data-id="{{ category.id }}"
@@ -45,44 +45,41 @@
                             data-price2="{{ category.price_tier_2 }}"
                             data-price3="{{ category.price_tier_3 }}"
                             data-qty1="{{ category.quantity_limit_1 }}"
-                            data-qty2="{{ category.quantity_limit_2 }}"
-                        >
+                            data-qty2="{{ category.quantity_limit_2 }}">
                             🔍 Detalhes
                         </button>
 
-                        {% if user.role in "manager admin" %}
+                        {% if user.role == "manager" or user.role == "admin" %}
                         <button 
-                            class="btn btn-sm btn-primary"
+                            class="btn btn-sm btn-outline-warning text-white"
                             data-bs-toggle="modal"
                             data-bs-target="#categoryModal"
                             data-mode="edit"
-                            data-id="{{ category.id }}"
+                            data-category-id="{{ category.id }}"
                             data-name="{{ category.name }}"
                             data-price1="{{ category.price_tier_1 }}"
                             data-price2="{{ category.price_tier_2 }}"
                             data-price3="{{ category.price_tier_3 }}"
                             data-qty1="{{ category.quantity_limit_1 }}"
-                            data-qty2="{{ category.quantity_limit_2 }}"
-                        >
+                            data-qty2="{{ category.quantity_limit_2 }}">
                             ✏️ Editar
                         </button>
+                        {% endif %}
 
                         {% if user.role == "admin" %}
                         <button
-                            class="btn btn-sm btn-danger"
+                            class="btn btn-sm btn-outline-danger"
                             data-bs-toggle="modal"
                             data-bs-target="#deleteModal"
-                            data-id="{{ category.id }}"
-                        >
-                            🗑️ Deletar
+                            data-id="{{ category.id }}">
+                            🗑️
                         </button>
-                        {% endif %}
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">Categorias não encontradas.</td>
+                    <td colspan="6" class="text-center text-muted">Nenhuma categoria encontrada.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -90,10 +87,10 @@
     </div>
 </div>
 
-<!-- Modal de Adição/Edição -->
+<!-- Modal de Criação/Edição -->
 <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-dark text-light">
             <form method="post" id="categoryForm">
                 {% csrf_token %}
                 {% include 'category/category_form.html' %}
@@ -105,14 +102,12 @@
 <!-- Modal de Detalhes -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content p-3">
-            <div class="modal-header">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header bg-purple text-white">
                 <h5 class="modal-title" id="detailsModalLabel">Detalhes da Categoria</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="detailsBody">
-                <!-- Conteúdo preenchido via JS -->
-            </div>
+            <div class="modal-body" id="detailsBody"></div>
         </div>
     </div>
 </div>
@@ -120,10 +115,10 @@
 <!-- Modal de Exclusão -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title">Excluir Categoria</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">Tem certeza de que deseja excluir esta categoria?</div>
             <div class="modal-footer">
@@ -143,54 +138,152 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('categoryModal');
-    modal.addEventListener('show.bs.modal', event => {
+    const form = document.getElementById('categoryForm');
+    const submitButton = document.getElementById('submit-button');
+
+    // helper: transforma "None"/"null"/undefined em ""
+    const safeValue = (v) => {
+        if (v === null || v === undefined) return "";
+        if (typeof v === "string") {
+            if (v === "None" || v === "null") return "";
+            return v;
+        }
+        return String(v);
+    };
+
+    // helper: normaliza vírgula->ponto e corta espaços
+    const normalizeNumberString = (s) => {
+        if (!s) return "";
+        return String(s).trim().replace(',', '.');
+    };
+
+    const setInputValue = (el, rawValue) => {
+        if (!el) return;
+        const v = normalizeNumberString(safeValue(rawValue));
+        // se é um input number, tentar formatar com 2 casas (mantém string se inválida)
+        if (el.type === 'number' && v !== "") {
+            // tenta converter para número e formatar, se falhar coloca raw
+            const n = Number(v);
+            if (!Number.isNaN(n)) {
+                // remove not necessary trailing zeros? mantemos 2 casas pra consistência
+                el.value = Number(n.toFixed(2));
+            } else {
+                el.value = v;
+            }
+        } else {
+            el.value = v;
+        }
+    };
+
+    function setupDynamicFieldLocking(isEditMode) {
+        const price1 = document.getElementById('form-price1');
+        const qty1 = document.getElementById('form-qty1');
+        const price2 = document.getElementById('form-price2');
+        const qty2 = document.getElementById('form-qty2');
+        const price3 = document.getElementById('form-price3');
+
+        // remove listeners antigos (defensivo) -> recria cloning
+        [price1, qty1, price2, qty2].forEach(el => {
+            if (!el) return;
+            const clone = el.cloneNode(true);
+            el.parentNode.replaceChild(clone, el);
+        });
+
+        // re-query after replace
+        const p1 = document.getElementById('form-price1');
+        const q1 = document.getElementById('form-qty1');
+        const p2 = document.getElementById('form-price2');
+        const q2 = document.getElementById('form-qty2');
+        const p3 = document.getElementById('form-price3');
+
+        if (isEditMode) {
+            [p1, q1, p2, q2, p3].forEach(el => { if (el) el.disabled = false; });
+            return;
+        }
+
+        // modo create: trava progressivamente
+        if (q1) q1.disabled = true;
+        if (p2) p2.disabled = true;
+        if (q2) q2.disabled = true;
+        if (p3) p3.disabled = true;
+
+        if (p1) p1.addEventListener('input', () => {
+            q1.disabled = p1.value.trim() === '';
+        });
+        if (q1) q1.addEventListener('input', () => {
+            p2.disabled = q1.value.trim() === '';
+        });
+        if (p2) p2.addEventListener('input', () => {
+            q2.disabled = p2.value.trim() === '';
+        });
+        if (q2) q2.addEventListener('input', () => {
+            p3.disabled = q2.value.trim() === '';
+        });
+    }
+
+    modal.addEventListener('show.bs.modal', (event) => {
         const button = event.relatedTarget;
-        const mode = button.getAttribute('data-mode');
-        const form = modal.querySelector('form');
+        const mode = (button && button.getAttribute('data-mode')) || 'create';
         const title = modal.querySelector('.modal-title');
-        const submitButton = document.getElementById('submit-button');
 
         if (mode === 'edit') {
             title.textContent = 'Editar Categoria';
-            form.action = `/categories/update/${button.dataset.id}/`;
+            form.action = `/categories/update/${button.getAttribute('data-id')}/`;
             submitButton.textContent = 'Atualizar';
 
-            document.getElementById('form-id').value = button.dataset.id;
-            document.getElementById('form-name').value = button.dataset.name;
-            document.getElementById('form-price1').value = button.dataset.price1;
-            document.getElementById('form-price2').value = button.dataset.price2;
-            document.getElementById('form-price3').value = button.dataset.price3;
-            document.getElementById('form-qty1').value = button.dataset.qty1;
-            document.getElementById('form-qty2').value = button.dataset.qty2;
-            document.getElementById('form-qty3').value = button.dataset.qty3;
+            // reset antes de preencher (mantém atributos default do form)
+            form.reset();
+
+            // habilita campos (modo edição)
+            setupDynamicFieldLocking(true);
+
+            // pega os valores direto do atributo (mais robusto que dataset em alguns casos)
+            setInputValue(document.getElementById('form-id'), button.getAttribute('data-id'));
+            setInputValue(document.getElementById('form-name'), button.getAttribute('data-name'));
+
+            // price fields -> normaliza vírgulas/pontos
+            setInputValue(document.getElementById('form-price1'), button.getAttribute('data-price1'));
+            setInputValue(document.getElementById('form-price2'), button.getAttribute('data-price2'));
+            setInputValue(document.getElementById('form-price3'), button.getAttribute('data-price3'));
+
+            // qty fields
+            setInputValue(document.getElementById('form-qty1'), button.getAttribute('data-qty1'));
+            setInputValue(document.getElementById('form-qty2'), button.getAttribute('data-qty2'));
+
         } else {
             title.textContent = 'Nova Categoria';
             form.action = '/categories/create/';
             submitButton.textContent = 'Salvar';
             form.reset();
+            setupDynamicFieldLocking(false);
         }
     });
 
+    // details modal (mantido)
     const detailsModal = document.getElementById('detailsModal');
-    detailsModal.addEventListener('show.bs.modal', event => {
-        const button = event.relatedTarget;
-        const body = document.getElementById('detailsBody');
-        body.innerHTML = `
-            <p><strong>Nome:</strong> ${button.dataset.name}</p>
-            <p><strong>Faixa de Preço 1:</strong> R$ ${button.dataset.price1} aplicado até limite de quantidade ${button.dataset.qty1}</p>
-            <p><strong>Faixa de Preço 2:</strong> ${button.dataset.price2 ? `R$ ${button.dataset.price2} aplicado até limite de quantidade ${button.dataset.qty2}` : '-'}</p>
-            <p><strong>Faixa de Preço 3:</strong> ${button.dataset.price3 ? `R$ ${button.dataset.price3}` : '-'} aplicado acima de quantidade ${button.dataset.qty2}</p>
-        `;
-    });
+    if (detailsModal) {
+        detailsModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            const body = document.getElementById('detailsBody');
+            body.innerHTML = `
+                <p><strong>Nome:</strong> ${safeValue(button.getAttribute('data-name'))}</p>
+                <p><strong>Faixa 1:</strong> R$ ${safeValue(button.getAttribute('data-price1'))} até ${safeValue(button.getAttribute('data-qty1')) || '∞'} unidades</p>
+                <p><strong>Faixa 2:</strong> ${button.getAttribute('data-price2') ? `R$ ${safeValue(button.getAttribute('data-price2'))} até ${safeValue(button.getAttribute('data-qty2')) || '∞'} unidades` : '-'}</p>
+                <p><strong>Faixa 3:</strong> ${button.getAttribute('data-price3') ? `R$ ${safeValue(button.getAttribute('data-price3'))} acima de ${safeValue(button.getAttribute('data-qty2')) || '?'} unidades` : '-'}</p>
+            `;
+        });
+    }
 
+    // delete modal
     const deleteModal = document.getElementById('deleteModal');
-    deleteModal.addEventListener('show.bs.modal', event => {
-        const button = event.relatedTarget;
-        const id = button.dataset.id;
-        const form = deleteModal.querySelector('form');
-        document.getElementById('deleteCategoryId').value = id;
-        form.action = `/categories/delete/${id}/`;
-    });
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            document.getElementById('deleteCategoryId').value = id;
+            deleteModal.querySelector('form').action = `/categories/delete/${id}/`;
+        });
+    }
 });
 </script>
 {% endblock %}
