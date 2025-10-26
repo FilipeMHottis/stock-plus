@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const body = document.getElementById('detailsBody');
             body.innerHTML = `
                 <p><strong>Nome:</strong> ${safeValue(button.getAttribute('data-name'))}</p>
-                <p><strong>Faixa 1:</strong> R$ ${safeValue(button.getAttribute('data-price1'))} até ${safeValue(button.getAttribute('data-qty1')) || '∞'} unidades</p>
+                <p><strong>Faixa 1:</strong> R$ ${safeValue(button.getAttribute('data-price1'))} até ${safeValue(button.getAttribute('data-qty1')) || '-'} unidades</p>
                 <p><strong>Faixa 2:</strong> ${button.getAttribute('data-price2') ? `R$ ${safeValue(button.getAttribute('data-price2'))} até ${safeValue(button.getAttribute('data-qty2')) || '-'} unidades` : '-'}</p>
                 <p><strong>Faixa 3:</strong> ${button.getAttribute('data-price3') ? `R$ ${safeValue(button.getAttribute('data-price3'))} acima de ${safeValue(button.getAttribute('data-qty2')) || '-'} unidades` : '-'}</p>
             `;
