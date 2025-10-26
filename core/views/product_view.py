@@ -25,6 +25,27 @@ def product(request: HttpRequest):
     )
 
 
+@login_required
+def search_products(request):
+    """Busca inteligente por produtos"""
+    query = request.GET.get("q", "").strip()
+    products = Product.objects.all()
+
+    if query:
+        products = Product.search_products(query)
+
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
+
+    context = {
+        "products": products,
+        "categories": categories,
+        "tags": tags,
+        "query": query,
+    }
+    return render(request, "product/product.html", context)
+
+
 @role_required(["admin", "checkout"])
 @login_required
 def product_update(request: HttpRequest, product_id: int):

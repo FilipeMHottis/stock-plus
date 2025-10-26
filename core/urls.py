@@ -28,6 +28,7 @@ from .views.product_view import (
     product_create,
     product_update,
     product_delete,
+    search_products
 )
 
 
@@ -131,6 +132,11 @@ urlpatterns = [
         "products/delete/<int:product_id>/",
         product_delete,
         name="product_delete",
+    ),
+    path(
+        "products/search/",
+        search_products,
+        name="search_products",
     ),
 ]
 
