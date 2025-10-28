@@ -1,0 +1,31 @@
+<div class="modal fade" id="deletePaymentModal" tabindex="-1" aria-labelledby="deletePaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title">Excluir Método de Pagamento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">Tem certeza de que deseja excluir este método?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" id="deletePaymentForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const deleteModal = document.getElementById("deletePaymentModal");
+    const deleteForm = document.getElementById("deletePaymentForm");
+
+    deleteModal.addEventListener("show.bs.modal", (event) => {
+        const button = event.relatedTarget;
+        const methodId = button.getAttribute("data-id");
+        deleteForm.action = `/report/payment/delete/${methodId}/`;
+    });
+});
+</script>

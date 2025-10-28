@@ -44,7 +44,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'category' %}">📂 Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'tag' %}">🏷️ Tags</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'customer' %}">👥 Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/">📊 Relatórios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'report' %}">📊 Relatórios</a></li>
 
                     <!-- Link para o admin, visível apenas para usuários staff -->  
                     {% if user.is_staff %}

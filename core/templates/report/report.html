@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Relatórios - Stock Plus{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row g-3">
+        <div class="col-12 col-lg-6 offset-lg-6">
+            {% include 'report/cards/payment_methods_card.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

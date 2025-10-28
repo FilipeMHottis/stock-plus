@@ -30,6 +30,12 @@ from .views.product_view import (
     product_delete,
     search_products
 )
+from .views.report_view import (
+    report,
+    payment_create,
+    payment_update,
+    payment_delete,
+)
 
 
 urlpatterns = [
@@ -137,6 +143,26 @@ urlpatterns = [
         "products/search/",
         search_products,
         name="search_products",
+    ),
+    path(
+        "report/",
+        report,
+        name="report",
+    ),
+    path(
+        "report/payment/create/",
+        payment_create,
+        name="payment_create",
+    ),
+    path(
+        "report/payment/update/<int:method_id>/",
+        payment_update,
+        name="payment_update",
+    ),
+    path(
+        "report/payment/delete/<int:method_id>/",
+        payment_delete,
+        name="payment_delete",
     ),
 ]
 
