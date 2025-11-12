@@ -1,6 +1,7 @@
 from django.db import models
 import os
 from django.core.files.base import ContentFile
+from django.forms import ValidationError
 from .tag import Tag
 from .category import Category
 from django.contrib.postgres.search import TrigramSimilarity
@@ -13,11 +14,10 @@ class Product(models.Model):
         upload_to='products/',
         default='products/product_default.png',
     )
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     stock = models.IntegerField(default=0)
     barcode = models.CharField(
         max_length=100,
-        unique=True,
         null=True,
         blank=True,
     )
@@ -37,6 +37,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        # Caso barcode seja diferente de none ou vazio, checar se já existe outro produto com o mesmo barcode
+        if self.barcode:
+            existing = Product.objects.filter(barcode=self.barcode).exclude(id=self.id)
+            if existing.exists():
+                raise ValidationError("Barcode já está em uso por outro produto.")
 
     def upload_image(self, image_file):
         """Salva uma nova imagem para o produto com nome padronizado."""

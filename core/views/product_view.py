@@ -6,6 +6,7 @@ from ..models.category import Category
 from ..models.tag import Tag
 from ..utils.role_required import role_required
 from django.http import HttpRequest
+from django.core.exceptions import ValidationError
 
 
 @login_required
@@ -74,10 +75,22 @@ def product_update(request: HttpRequest, product_id: int):
             product.upload_image(image)
         product.category_id = category_id
         product.tags.set(tags)
-        product.save()
 
+        try:
+            product.full_clean()
+        except ValidationError as e:
+            messages.error(request, e.message_dict.get('barcode', ['Erro ao validar produto.'])[0])
+            return render(request, "product/product.html", {
+                "products": Product.objects.all(),
+                "categories": Category.objects.all(),
+                "tags": Tag.objects.all(),
+                "form_error": e.message_dict.get('barcode', ['Erro ao validar produto.'])[0],
+                "form_data": request.POST,
+                "modal_open": "create",  # ou "edit" conforme o caso
+            })
+        product.save()
         messages.success(request, "Produto atualizado com sucesso.")
-        return redirect("product")
+    return redirect("product")   
 
 
 @role_required(["admin", "checkout"])
@@ -102,6 +115,7 @@ def product_create(request: HttpRequest):
         tags = request.POST.getlist("tags")
 
         if not name or not stock:
+            print("Nome ou estoque não fornecidos")
             messages.error(
                 request,
                 "Nome e Estoque são obrigatórios.",
@@ -115,13 +129,28 @@ def product_create(request: HttpRequest):
             barcode=barcode,
             category_id=category_id,
         )
+        try:
+            product.full_clean()
+        except ValidationError as e:
+            print("Validation error:", e)
+            messages.error(request, e.message_dict.get('barcode', ['Erro ao validar produto.'])[0])
+            return render(request, "product/product.html", {
+                "products": Product.objects.all(),
+                "categories": Category.objects.all(),
+                "tags": Tag.objects.all(),
+                "form_error": e.message_dict.get('barcode', ['Erro ao validar produto.'])[0],
+                "form_data": request.POST,
+                "modal_open": "create",  # ou "edit" conforme o caso
+            })
         product.save()
 
         if image:
             product.upload_image(image)
-
+            print("Imagem enviada e salva para o produto:", product.id)
         if tags:
             product.tags.set(tags)
 
         messages.success(request, "Produto criado com sucesso.")
         return redirect("product")
+    # Para GET, redirecione ou renderize o formulário
+    return redirect("product")

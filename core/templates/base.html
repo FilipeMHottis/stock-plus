@@ -24,6 +24,10 @@
         opacity: 0.7;
         cursor: not-allowed;
     }
+    .page-item.active .page-link {
+        background-color: #6f42c1;
+        border-color: #6f42c1;
+    }
 </style>
 
 <body class="bg-secondary-subtle text-light">
@@ -39,7 +43,7 @@
             <!-- Menu de navegação -->
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="/">🛒 Vendas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sale' %}">🛒 Vendas</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">🗳️ Produtos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'category' %}">📂 Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'tag' %}">🏷️ Tags</a></li>

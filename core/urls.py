@@ -36,6 +36,14 @@ from .views.report_view import (
     payment_update,
     payment_delete,
 )
+from .views.sale_view import (
+    sale,
+    sale_preview,
+    sale_create,
+    sale_update,
+    sale_delete,
+    search_products,
+)
 
 
 urlpatterns = [
@@ -163,6 +171,36 @@ urlpatterns = [
         "report/payment/delete/<int:method_id>/",
         payment_delete,
         name="payment_delete",
+    ),
+    path(
+        "sales/",
+        sale,
+        name="sale",
+    ),
+    path(
+        "sales/preview/",
+        sale_preview,
+        name="sale_preview",
+    ),
+    path(
+        "sales/create/",
+        sale_create,
+        name="sale_create",
+    ),
+    path(
+        "sales/update/<int:sale_id>/",
+        sale_update,
+        name="sale_update",
+    ),
+    path(
+        "sales/delete/<int:sale_id>/",
+        sale_delete,
+        name="sale_delete",
+    ),
+    path(
+        "sales/search/",
+        search_products,
+        name="search_products",
     ),
 ]
 

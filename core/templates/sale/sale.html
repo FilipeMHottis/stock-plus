@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Nova Venda - Stock Plus{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row g-4">
+        <!-- 🧊 COLUNA ESQUERDA: Produtos -->
+        <div class="col-lg-8">
+            <div class="card bg-dark text-light shadow-sm">
+                <div class="card-header bg-purple d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">🛍️ Produtos</h4>
+                    {% include 'search_bar.html' %}
+                </div>
+
+                <div class="card-body">
+                    <!-- 🔄 Conteúdo dinâmico atualizado via AJAX -->
+                    <div id="product-container">
+                        {% include 'sale/partials/product_list.html' with products=products %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🧾 COLUNA DIREITA: Carrinho -->
+        <div class="col-lg-4">
+            {% include 'sale/partials/cart.html' %}
+        </div>
+    </div>
+</div>
+
+{% include 'sale/partials/modals.html' %}
+{% include 'sale/partials/scripts.html' %}
+{% endblock %}

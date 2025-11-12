@@ -1,0 +1,82 @@
+<div class="d-flex justify-content-between align-items-end pb-3">
+    <div>
+        <label class="me-2">Itens por página:</label>
+        <select id="itemsPerPage"
+            class="form-select form-select-sm d-inline-block w-auto bg-dark text-light border-secondary">
+            {% for size in page_sizes %}
+                <option value="{{ size }}"
+                    {% if size == products.paginator.per_page %}selected{% endif %}>
+                    {{ size }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <button class="page-link bg-dark text-light border-secondary page-btn"
+                            data-page="{{ page_obj.previous_page_number }}">«</button>
+                </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                    <button class="page-link bg-dark text-light border-secondary page-btn"
+                            data-page="{{ num }}">{{ num }}</button>
+                </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <button class="page-link bg-dark text-light border-secondary page-btn"
+                            data-page="{{ page_obj.next_page_number }}">»</button>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+
+<div class="row row-cols-1 row-cols-md-3 g-3">
+    {% for product in products %}
+    <div class="col">
+        <div class="card bg-dark text-light shadow-lg border-0 rounded-4 h-100 transition-all hover-glow">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+                    <p class="small text-muted mb-1">{{ product.category.name }}</p>
+                    <p class="small text-muted mb-1">Estoque: <strong>{{ product.stock }}</strong></p>
+                    <p class="text-success fw-bold mb-2">
+                        R$ {{ product.category.price_tier_1|floatformat:2 }}
+                    </p>
+                    <p class="text-muted small mb-0">
+                        {% if product.description %}
+                            {{ product.description|truncatechars:60 }}
+                        {% else %}
+                            <em>Sem descrição</em>
+                        {% endif %}
+                    </p>
+                    {% for tag in product.tags.all %}
+                        <span class="badge" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-sm btn-purple w-100 mt-3 add-to-cart"
+                        data-id="{{ product.id }}"
+                        data-name="{{ product.name }}"
+                        data-category="{{ product.category.name }}"
+                        data-price="{{ product.category.price_tier_1 }}"
+                        data-stock="{{ product.stock }}">
+                    ➕ Adicionar ao Carrinho
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col">
+        <div class="alert alert-dark text-center border border-secondary">
+            Nenhum produto encontrado.
+        </div>
+    </div>
+    {% endfor %}
+</div>

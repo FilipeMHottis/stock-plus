@@ -53,6 +53,7 @@ def category_update(request: HttpRequest, category_id: int):
     category = get_object_or_404(Category, id=category_id)
 
     if request.method == "POST":
+        id = request.POST.get("id")
         name = request.POST.get("name")
         price_tier_1 = request.POST.get("price_tier_1")
         price_tier_2 = request.POST.get("price_tier_2") or None
@@ -64,6 +65,13 @@ def category_update(request: HttpRequest, category_id: int):
             messages.error(
                 request,
                 "Nome e Preço da Faixa 1 são obrigatórios.",
+            )
+            return redirect("category")
+
+        if str(category.id) != id:
+            messages.error(
+                request,
+                "ID da categoria inválido.",
             )
             return redirect("category")
 

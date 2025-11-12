@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mode === 'edit') {
             title.textContent = 'Editar Categoria';
-            form.action = `/categories/update/${button.getAttribute('data-id')}/`;
+            form.action = `/categories/update/${button.dataset.categoryId}/`;
             submitButton.textContent = 'Atualizar';
 
             // reset antes de preencher (mantém atributos default do form)
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setupDynamicFieldLocking(true);
 
             // pega os valores direto do atributo (mais robusto que dataset em alguns casos)
-            setInputValue(document.getElementById('form-id'), button.getAttribute('data-id'));
+            setInputValue(document.getElementById('form-id'), button.getAttribute('data-category-id'));
             setInputValue(document.getElementById('form-name'), button.getAttribute('data-name'));
 
             // price fields -> normaliza vírgulas/pontos

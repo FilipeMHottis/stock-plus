@@ -1,0 +1,288 @@
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const CART_KEY = "stockplus_cart";
+    const FORM_KEY = "stockplus_sale_form";
+
+    const cart = loadCart();
+    const cartItems = document.getElementById("cart-items");
+    const discountField = document.getElementById("discount");
+    const summaryItems = document.getElementById("summary-items");
+    const summaryTotal = document.getElementById("summary-total");
+    const summaryDiscount = document.getElementById("summary-discount");
+    const scheduledContainer = document.getElementById("scheduled-container");
+    const statusField = document.getElementById("status");
+    const customerField = document.getElementById("customer");
+    const dateField = document.getElementById("scheduled_date");
+
+    const modal = new bootstrap.Modal(document.getElementById("messageModal"));
+    const modalText = document.getElementById("modalMessageText");
+
+    // 🧠 Utilitário de mensagem
+    function showMessage(text) {
+        modalText.innerHTML = text;
+        modal.show();
+    }
+
+    // --- LOCAL STORAGE ---
+    function loadCart() {
+        try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; }
+        catch { return {}; }
+    }
+    function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+    function clearCart() {
+        localStorage.removeItem(CART_KEY);
+        Object.keys(cart).forEach(k => delete cart[k]);
+        renderCart();
+        updatePreview();
+        showMessage("🧹 Carrinho limpo com sucesso!");
+    }
+
+    // --- SESSION STORAGE ---
+    function saveFormState() {
+        const data = {
+            customer: customerField.value,
+            status: statusField.value,
+            discount: discountField.value,
+            scheduled_date: dateField.value,
+        };
+        sessionStorage.setItem(FORM_KEY, JSON.stringify(data));
+    }
+    function loadFormState() {
+        const saved = sessionStorage.getItem(FORM_KEY);
+        if (!saved) return;
+        try {
+            const data = JSON.parse(saved);
+            if (data.customer) customerField.value = data.customer;
+            if (data.status) statusField.value = data.status;
+            if (data.discount) discountField.value = data.discount;
+            if (data.scheduled_date) dateField.value = data.scheduled_date;
+            scheduledContainer.style.display = data.status === "scheduled" ? "block" : "none";
+        } catch (e) {}
+    }
+
+    [customerField, statusField, discountField, dateField].forEach(el => {
+        el.addEventListener("input", saveFormState);
+        el.addEventListener("change", saveFormState);
+    });
+
+    // --- Mostrar/ocultar data agendada ---
+    statusField.addEventListener("change", () => {
+        if (statusField.value === "scheduled") {
+            scheduledContainer.style.display = "block";
+        } else {
+            scheduledContainer.style.display = "none";
+            dateField.value = "";
+        }
+        saveFormState();
+    });
+
+    // -- Funções do pesquisar produtos (AJAX) ---
+    const searchForm = document.querySelector('.search-bar-container form');
+    const productContainer = document.getElementById("product-container");
+
+    if (searchForm) {
+        searchForm.addEventListener("submit", async (e) => {
+            e.preventDefault(); // evita recarregar a página
+
+            const query = searchForm.querySelector('input[name="q"]').value.trim();
+            const url = `{% url 'search_products' %}?q=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                });
+
+                const data = await response.json();
+                if (data.success && data.html) {
+                    productContainer.innerHTML = data.html;
+                    // reanexa os eventos "adicionar ao carrinho" nos novos botões
+                    attachAddToCartEvents();
+                } else {
+                    productContainer.innerHTML = `
+                        <div class="alert alert-dark text-center border border-secondary">
+                            Nenhum produto encontrado.
+                        </div>`;
+                }
+            } catch (err) {
+                console.error("Erro na busca:", err);
+                productContainer.innerHTML = `
+                    <div class="alert alert-danger text-center border border-secondary">
+                        Ocorreu um erro ao buscar produtos.
+                    </div>`;
+            }
+        });
+    }
+
+    // --- Paginação AJAX ---
+    function attachPaginationEvents() {
+        // Botões de página
+        document.querySelectorAll(".page-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const page = btn.dataset.page;
+                const perPage = document.getElementById("itemsPerPage")?.value || 10;
+                const query = document.querySelector('input[name="q"]').value.trim();
+                await fetchProducts(query, page, perPage);
+            });
+        });
+
+        // Alterar quantidade por página
+        const perPageSelect = document.getElementById("itemsPerPage");
+        if (perPageSelect) {
+            perPageSelect.addEventListener("change", async () => {
+                const perPage = perPageSelect.value;
+                const query = document.querySelector('input[name="q"]').value.trim();
+                await fetchProducts(query, 1, perPage);
+            });
+        }
+    }
+
+    // --- Função central para atualizar produtos ---
+    async function fetchProducts(query = "", page = 1, perPage = 10) {
+        const url = `{% url 'search_products' %}?q=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`;
+
+        try {
+            const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+            const data = await response.json();
+
+            if (data.success && data.html) {
+                document.getElementById("product-container").innerHTML = data.html;
+                attachAddToCartEvents();
+                attachPaginationEvents();
+            }
+        } catch (err) {
+            console.error("Erro ao carregar produtos:", err);
+        }
+    }
+
+    // Ativar paginação após carregamento inicial
+    attachPaginationEvents();
+    
+    // --- Botão limpar ---
+    document.getElementById("clear-cart").addEventListener("click", clearCart);
+
+    // --- Adicionar produto ---
+    function attachAddToCartEvents() {
+        document.querySelectorAll(".add-to-cart").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const name = btn.dataset.name;
+                const basePrice = parseFloat(btn.dataset.price) || 0;
+                const stock = parseInt(btn.dataset.stock) || 0;
+
+                if (!cart[id]) cart[id] = { name, quantity: 1, price: basePrice, stock };
+                else if (cart[id].quantity < stock) cart[id].quantity += 1;
+
+                saveCart(); renderCart(); updatePreview();
+            });
+        });
+    }
+
+    // --- Renderizar carrinho (igual ao seu original) ---
+    function renderCart() {
+        cartItems.innerHTML = "";
+        const keys = Object.keys(cart);
+        if (keys.length === 0) {
+            cartItems.innerHTML = "<p class='text-muted small'>Nenhum produto no carrinho.</p>";
+            summaryItems.textContent = "0";
+            summaryTotal.textContent = "0.00";
+            summaryDiscount.textContent = "0.00";
+            return;
+        }
+
+        keys.forEach(id => {
+            const item = cart[id];
+            const subtotal = (parseFloat(item.price) || 0) * item.quantity;
+            const div = document.createElement("div");
+            div.className = "d-flex justify-content-between align-items-center mb-3 p-2 border-bottom border-secondary";
+
+            div.innerHTML = `
+                <div class="flex-grow-1">
+                    <div class="fw-bold text-truncate">${item.name}</div>
+                    <div class="text-muted small">R$ ${Number(item.price).toFixed(2)} cada</div>
+                    <div class="mt-1">
+                        <input type="number" min="1" max="${item.stock}" value="${item.quantity}" 
+                            class="form-control form-control-sm qty-input" 
+                            data-id="${id}" style="width: 80px; display:inline-block;">
+                        <span class="text-muted small ms-1">/ ${item.stock} unid.</span>
+                    </div>
+                </div>
+                <div class="text-end ms-2" style="min-width:120px">
+                    <strong>R$ ${Number(subtotal).toFixed(2)}</strong>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-item" data-id="${id}">❌</button>
+                    </div>
+                    <input type="hidden" name="product_${id}" value="${item.quantity}">
+                </div>
+            `;
+            cartItems.appendChild(div);
+        });
+
+        document.querySelectorAll(".remove-item").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                const removed = cart[id].name;
+                delete cart[id];
+                saveCart(); renderCart(); updatePreview();
+            });
+        });
+
+        document.querySelectorAll(".qty-input").forEach(input => {
+            const id = input.dataset.id;
+            input.addEventListener("input", debounce((e) => {
+                const value = parseInt(e.target.value) || 1;
+                cart[id].quantity = Math.min(value, cart[id].stock);
+                saveCart(); renderCart(); updatePreview();
+            }, 1000));
+        });
+    }
+
+    function debounce(func, delay) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    async function updatePreview() {
+        const items = Object.entries(cart).map(([id, it]) => ({
+            product_id: id, quantity: it.quantity
+        }));
+        const discount = parseFloat(discountField.value) || 0;
+        if (items.length === 0) {
+            summaryItems.textContent = 0;
+            summaryTotal.textContent = "0.00";
+            summaryDiscount.textContent = discount.toFixed(2);
+            return;
+        }
+
+        try {
+            const response = await fetch("{% url 'sale_preview' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ items, discount })
+            });
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error);
+
+            (data.items || []).forEach(it => {
+                const key = String(it.product_id);
+                if (cart[key]) cart[key].price = Number(it.unit_price);
+            });
+            saveCart(); renderCart();
+            summaryItems.textContent = data.total_quantity || 0;
+            summaryDiscount.textContent = Number(data.discount || 0).toFixed(2);
+            summaryTotal.textContent = Number(data.total || 0).toFixed(2);
+        } catch (err) { console.error("Erro preview:", err); }
+    }
+
+    // --- Inicialização ---
+    loadFormState();
+    attachAddToCartEvents();
+    renderCart();
+    updatePreview();
+});
+</script>
