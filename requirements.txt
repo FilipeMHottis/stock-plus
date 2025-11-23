@@ -1,6 +1,17 @@
-asgiref==3.9.1
 Django==5.2.5
+asgiref==3.9.1
 sqlparse==0.5.3
-psycopg2-binary==2.9.11
+tzdata==2025.2
 python-dotenv==1.1.1
+psycopg2-binary==2.9.11
+
+# PDF e imagens
+reportlab==4.4.5
 pillow==12.0.0
+pycairo==1.29.0
+rlPyCairo==0.4.0
+
+# Impressão
+pywin32==311
+win32printing==0.1.3
+cups==0.0.6

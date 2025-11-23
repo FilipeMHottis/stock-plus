@@ -1,0 +1,11 @@
+{
+    "DEFAULT": {
+        "user": {
+            "id": 0,
+            "name": "DEFAULT"
+        },
+        "print_name": "EPSON3F7A62 (L3250 Series)",
+        "paper_width_mm": 80,
+        "interface": "system"
+    }
+}
