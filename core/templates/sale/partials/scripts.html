@@ -29,12 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
         catch { return {}; }
     }
     function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
-    function clearCart() {
+    function clearCart(openingMessage = true) {
         localStorage.removeItem(CART_KEY);
         Object.keys(cart).forEach(k => delete cart[k]);
         renderCart();
         updatePreview();
-        showMessage("🧹 Carrinho limpo com sucesso!");
+        if (openingMessage) {
+            showMessage("🧹 Carrinho limpo com sucesso!");
+        }
     }
 
     // --- SESSION STORAGE ---
@@ -77,43 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // -- Funções do pesquisar produtos (AJAX) ---
-    const searchForm = document.querySelector('.search-bar-container form');
+    const searchForm = document.querySelector('#searchForm');
     const productContainer = document.getElementById("product-container");
 
     if (searchForm) {
         searchForm.addEventListener("submit", async (e) => {
-            e.preventDefault(); // evita recarregar a página
+            e.preventDefault();
 
             const query = searchForm.querySelector('input[name="q"]').value.trim();
-            const url = `{% url 'search_products' %}?q=${encodeURIComponent(query)}`;
-
-            try {
-                const response = await fetch(url, {
-                    headers: { "X-Requested-With": "XMLHttpRequest" },
-                });
-
-                const data = await response.json();
-                if (data.success && data.html) {
-                    productContainer.innerHTML = data.html;
-                    // reanexa os eventos "adicionar ao carrinho" nos novos botões
-                    attachAddToCartEvents();
-                } else {
-                    productContainer.innerHTML = `
-                        <div class="alert alert-dark text-center border border-secondary">
-                            Nenhum produto encontrado.
-                        </div>`;
-                }
-            } catch (err) {
-                console.error("Erro na busca:", err);
-                productContainer.innerHTML = `
-                    <div class="alert alert-danger text-center border border-secondary">
-                        Ocorreu um erro ao buscar produtos.
-                    </div>`;
-            }
+            await fetchProducts(query, 1);
         });
     }
 
-    // --- Paginação AJAX ---
+    // --- Paginação e itens por página ---
     function attachPaginationEvents() {
         // Botões de página
         document.querySelectorAll(".page-btn").forEach(btn => {
@@ -136,23 +114,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- Função central para atualizar produtos ---
+
+    // --- Função principal para buscar produtos ---
     async function fetchProducts(query = "", page = 1, perPage = 10) {
-        const url = `{% url 'search_products' %}?q=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`;
+        const url = `{% url 'search_products_sale' %}?q=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`;
 
         try {
-            const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+            const response = await fetch(url, {
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            });
+
             const data = await response.json();
 
             if (data.success && data.html) {
-                document.getElementById("product-container").innerHTML = data.html;
+                productContainer.innerHTML = data.html;
+
+                // Reanexar eventos
                 attachAddToCartEvents();
                 attachPaginationEvents();
             }
+
         } catch (err) {
             console.error("Erro ao carregar produtos:", err);
         }
     }
+
 
     // Ativar paginação após carregamento inicial
     attachPaginationEvents();
@@ -278,6 +264,278 @@ document.addEventListener("DOMContentLoaded", () => {
             summaryTotal.textContent = Number(data.total || 0).toFixed(2);
         } catch (err) { console.error("Erro preview:", err); }
     }
+
+    // ----------- ABRIR MODAL DE CONFIRMAÇÃO -----------
+    document.getElementById("saleForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        openConfirmSaleModal();
+    });
+
+    function openConfirmSaleModal() {
+        const modal = new bootstrap.Modal(document.getElementById("confirmSaleModal"));
+        
+        document.getElementById("confirmSaleModal").addEventListener("shown.bs.modal", () => {
+            loadConfirmFields();
+            updateInvoicePreview();
+        });
+
+        modal.show();
+    }
+
+    // ----------- PREENCER CAMPOS DO LADO DIREITO -----------
+    function loadConfirmFields() {
+        document.getElementById("confirm_customer").value = customerField.value;
+        document.getElementById("confirm_status").value = statusField.value;
+        document.getElementById("confirm_discount").value = discountField.value;
+
+        // Mostrar campo data
+        document.getElementById("confirm_scheduled_wrapper").style.display =
+            statusField.value === "scheduled" ? "block" : "none";
+
+        // Pagamento → dinheiro?
+        const paymentSelect = document.getElementById("confirm_payment");
+        const selected = paymentSelect.options[paymentSelect.selectedIndex];
+    }
+
+    // ----------- ATUALIZAR NOTA FISCAL ESQUERDA -----------
+    async function updateInvoicePreview() {
+        const preview = document.getElementById("invoice-preview");
+        preview.innerHTML = "";
+
+        if (Object.keys(cart).length === 0) {
+            preview.innerHTML = "<p class='text-muted'>Carrinho vazio.</p>";
+            return;
+        }
+
+        let html = `
+            <div class="thermal-title">Stock Plus</div>
+            <div class="thermal-small"><strong>-=-=- Comprovante de Venda -=-=-</strong></div>
+            <div class="thermal-small">Isso não é uma nota fiscal, apenas um comprovante de venda.</div>
+            <div class="thermal-section"></div>
+        `;
+
+        // Se custumer for diferente de Cliente Avulso de ID 1, mostrar informaçao na nota
+        const customerId = document.getElementById("confirm_customer").value;
+
+        if (customerId !== "1") {
+            // fazer feach de customer customers/search/
+            const response = await fetch(`{% url 'customer_search' %}?q=${customerId}`)
+                .then(response => response.json())
+            
+            const customerName = response.results.length > 0 ? response.results[0].name : "";
+            const customerTradeName = response.results.length > 0 ? response.results[0].trade_name : "";
+            const customerCnpjCpf = response.results.length > 0 ? response.results[0].cnpj_or_cpf : "";
+            const customerPhone = response.results.length > 0 ? response.results[0].phone : "";
+            const customerAddress = response.results.length > 0 ? response.results[0].address : "";
+            
+            html += `
+                <div class="thermal-small ">
+                    <strong>Razão Social:</strong> ${customerName}<br>
+                    <strong>Nome Fantasia:</strong> ${customerTradeName}<br>
+                    <strong>CNPJ/CPF:</strong> ${customerCnpjCpf}<br>
+                    <strong>Numero:</strong> ${customerPhone}<br>
+                    <strong>Endereço:</strong> ${customerAddress}<br>
+                </div>
+                <div class="thermal-section"></div> 
+
+                <div class="thermal-small">
+                    <strong>Produtos</strong>
+                </div>
+                <div class="thermal-section"></div>
+            `;
+        }
+
+        Object.values(cart).forEach(item => {
+            const subtotal = item.price * item.quantity;
+
+            html += `
+                <div class="thermal-small">
+                    <strong>${item.name}</strong><br>
+                    ${item.quantity} un × R$ ${item.price.toFixed(2)}<br>
+                    Subtotal: R$ ${subtotal.toFixed(2)}
+                </div>
+                <div class="thermal-section"></div>
+            `;
+        });
+
+        const discount = parseFloat(document.getElementById("confirm_discount").value) || 0;
+        html += `
+            <div class="thermal-small">
+                <strong>DESCONTO:</strong> R$ ${discount.toFixed(2)}
+            </div>
+            <div class="thermal-section"></div>
+        `;
+
+        const total = summaryTotal.textContent || "0.00";
+
+        html += `
+            <div class="thermal-big"><strong>TOTAL: R$ ${total}</strong></div>
+            <div class="thermal-section"></div>
+        `;
+
+        const moneyGiven = parseFloat(document.getElementById("money_given").value) || 0;
+        const change = Math.round((moneyGiven - parseFloat(total)) / 0.05) * 0.05 || 0;
+        if (change >= 0) {
+            html += `
+                <div class="thermal-small">
+                    <strong>DINHEIRO RECEBIDO:</strong> R$ ${moneyGiven.toFixed(2)}<br>
+                    <strong>TROCO:</strong> R$ ${change.toFixed(2)}
+                </div>
+                <div class="thermal-section"></div>
+            `;
+        }
+
+        preview.innerHTML = html;
+    }
+
+    /* ----------------------------------------------
+       FUNÇÕES DO PAGAMENTO EM DINHEIRO
+    ---------------------------------------------- */
+
+    document.getElementById("confirm_payment").addEventListener("change", function () {
+        const type = this.options[this.selectedIndex].dataset.type;
+        toggleMoneyInput(type === "cash");
+    });
+
+    function toggleMoneyInput(show) {
+        const wrap = document.getElementById("money_wrapper");
+        const changeDiv = document.getElementById("change_display");
+
+        if (show) {
+            wrap.classList.remove("d-none");
+        } else {
+            wrap.classList.add("d-none");
+            changeDiv.classList.add("d-none");
+        }
+    }
+
+    // Calcular troco ao digitar
+    document.getElementById("money_given").addEventListener("input", () => {
+        const total = parseFloat(summaryTotal.textContent);
+        const given = parseFloat(document.getElementById("money_given").value) || 0;
+
+        let change = given - total;
+
+        if (change < 0) {
+            document.getElementById("change_display").classList.add("d-none");
+            return;
+        }
+
+        change = Math.round(change / 0.05) * 0.05;
+
+        document.getElementById("change_value").textContent = change.toFixed(2);
+        document.getElementById("change_display").classList.remove("d-none");
+    });
+
+
+    /* ----------------------------------------------
+       FINALIZAR VENDA
+    ---------------------------------------------- */
+
+    const confirmSaleButton = document.getElementById("confirmSaleButtonModal");
+
+    confirmSaleButton.addEventListener("click", async () => {
+        const customer = document.getElementById("confirm_customer").value;
+        const status = document.getElementById("confirm_status").value;
+        const discount = parseFloat(document.getElementById("confirm_discount").value) || 0;
+        const scheduledDate = document.getElementById("confirm_scheduled_date").value;
+        const paymentMethod = document.getElementById("confirm_payment").value;
+
+        const items = Object.entries(cart).map(([id, it]) => ({
+            product_id: id,
+            quantity: it.quantity
+        }));
+
+        const body = {
+            customer,
+            status,
+            discount,
+            scheduled_date: scheduledDate,
+            payment_method: paymentMethod,
+            items
+        };
+
+        try {
+            const response = await fetch("{% url 'sale_create' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+            if (!data.success) throw new Error(data.error);
+
+            /* --------------------------------------
+               SE PAGAMENTO FOR DINHEIRO → MODAL TROCO
+            -------------------------------------- */
+
+            const paymentType =
+                document.getElementById("confirm_payment")
+                .selectedOptions[0].dataset.type;
+
+            if (paymentType === "cash") {
+                const total = parseFloat(summaryTotal.textContent);
+                const given = parseFloat(document.getElementById("money_given").value) || 0;
+
+                let change = given - total;
+                if (change < 0) change = 0;
+
+                change = Math.round(change / 0.05) * 0.05;
+
+                document.getElementById("changeFinalValue").textContent =
+                    change.toFixed(2);
+
+                const modal = new bootstrap.Modal(document.getElementById("changeModal"));
+                modal.show();
+                
+                // Fechar modal de finalização de venda
+                const confirmModalEl = document.getElementById("confirmSaleModal");
+                const confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+                confirmModal.hide();
+
+                // Esperar fechar o modal de troco
+                modalEl = document.getElementById("changeModal");
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    clearCart(false);
+                    sessionStorage.removeItem(FORM_KEY);
+
+                    // retornar para a página de vendas (para novas vendas)
+                    window.location.href = `{% url 'sale'%}`;
+                });
+
+                return;
+            }
+
+            clearCart(false);
+            sessionStorage.removeItem(FORM_KEY);
+
+            // retornar para a página de vendas (para novas vendas)
+            window.location.href = `{% url 'sale'%}`;
+        } catch (err) {
+            showMessage("❌ Erro ao concluir venda: " + err.message);
+        }
+    });
+
+    document.getElementById("confirm_discount").addEventListener("change", function() {
+        document.getElementById("discount").value = this.value;
+        updatePreview();
+    });
+
+    /* ----------------------------------------------
+       ATUALIZAR NOTA FISCAL ESQUERDA
+    ---------------------------------------------- */
+    const formConfirmSaleModal = document.getElementById("confirmSaleForm");
+    const discountConfirmField = document.getElementById("confirm_discount");
+    // Atualizar ao mudar qualquer campo, apos 1 segundo
+    formConfirmSaleModal.addEventListener("input", debounce(updateInvoicePreview, 1000));
+    formConfirmSaleModal.addEventListener("change", debounce(updateInvoicePreview, 1000));
+    discountConfirmField.addEventListener("input", debounce(updatePreview, 1000));
+    discountConfirmField.addEventListener("change", debounce(updatePreview, 1000));
+    // reacualcular troco ao mudar valor dado
+    document.getElementById("money_given").addEventListener("input", debounce(updateInvoicePreview, 1000));
 
     // --- Inicialização ---
     loadFormState();

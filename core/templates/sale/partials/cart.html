@@ -17,11 +17,20 @@
             <!-- Cliente -->
             <div class="mb-3">
                 <label class="form-label fw-bold">Cliente</label>
-                <select name="customer" id="customer" class="form-select bg-dark text-light border-secondary">
+                <input 
+                    type="text" 
+                    id="customer_search"
+                    class="form-control bg-dark text-light border-secondary"
+                    placeholder="Pesquisar cliente..."
+                    autocomplete="off"
+                    list="customer-list"
+                >
+                <datalist id="customer-list">
                     {% for c in customers %}
-                    <option value="{{ c.id }}">{{ c.name }}</option>
+                        <option value="{{ c.name }} - {{ c.email }}" data-id="{{ c.id }}"></option>
                     {% endfor %}
-                </select>
+                </datalist>
+                <input type="hidden" name="customer" id="customer" value="1">
             </div>
 
             <!-- Tipo da venda -->
@@ -59,3 +68,31 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const input = document.getElementById("customer_search");
+    const hidden = document.getElementById("customer");
+    const options = document.querySelectorAll("#customer-list option");
+
+    // Preencher campo visível com o nome do cliente de id 1 ao carregar
+    {% for c in customers %}
+        {% if c.id == 1 %}
+            input.value = "{{ c.name }} - {{ c.email }}";
+        {% endif %}
+    {% endfor %}
+
+    input.addEventListener("change", function() {
+        let found = false;
+        options.forEach(opt => {
+            if (opt.value === input.value) {
+                hidden.value = opt.getAttribute("data-id");
+                found = true;
+            }
+        });
+        if (!found) {
+            hidden.value = "";
+        }
+    });
+});
+</script>

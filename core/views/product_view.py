@@ -8,7 +8,6 @@ from ..utils.role_required import role_required
 from django.http import HttpRequest
 from django.core.exceptions import ValidationError
 
-
 @login_required
 def product(request: HttpRequest):
     products = Product.objects.all()
@@ -44,6 +43,7 @@ def search_products(request):
         "tags": tags,
         "query": query,
     }
+
     return render(request, "product/product.html", context)
 
 

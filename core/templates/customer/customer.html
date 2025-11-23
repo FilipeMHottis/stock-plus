@@ -39,7 +39,8 @@
                                 data-trade="{{ customer.trade_name }}"
                                 data-phone="{{ customer.phone }}"
                                 data-email="{{ customer.email }}"
-                                data-address="{{ customer.address }}">
+                                data-address="{{ customer.address }}"
+                                data-document="{{ customer.cnpj_or_cpf }}">
                             ✏️ Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger"
@@ -123,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('form-phone').value = button.dataset.phone;
             document.getElementById('form-email').value = button.dataset.email;
             document.getElementById('form-address').value = button.dataset.address;
+            document.getElementById('form-document').value = button.dataset.document;
         } else {
             modalTitle.textContent = 'Novo Cliente';
             form.action = '/customers/create/';

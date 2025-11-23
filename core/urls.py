@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 from .views.customer_view import (
     customer,
     customer_create,
+    customer_search,
     customer_update,
     customer_delete,
 )
@@ -28,13 +29,15 @@ from .views.product_view import (
     product_create,
     product_update,
     product_delete,
-    search_products
+    search_products,
 )
 from .views.report_view import (
     report,
     payment_create,
     payment_update,
     payment_delete,
+    sale_detail_api,
+    sales_list_api,
 )
 from .views.sale_view import (
     sale,
@@ -42,7 +45,7 @@ from .views.sale_view import (
     sale_create,
     sale_update,
     sale_delete,
-    search_products,
+    search_products_sale,
 )
 
 
@@ -86,6 +89,11 @@ urlpatterns = [
         "customers/delete/<int:id>/",
         customer_delete,
         name="customer_delete",
+    ),
+    path(
+        "customers/search/",
+        customer_search,
+        name="customer_search",
     ),
     path(
         "tags/",
@@ -199,8 +207,18 @@ urlpatterns = [
     ),
     path(
         "sales/search/",
-        search_products,
-        name="search_products",
+        search_products_sale,
+        name="search_products_sale",
+    ),
+    path(
+        "sales/<int:sale_id>/detail/",
+        sale_detail_api,
+        name="sale_detail_api"
+    ),
+    path(
+        "report/sales/api/",
+        sales_list_api,
+        name="sales_list_api"
     ),
 ]
 

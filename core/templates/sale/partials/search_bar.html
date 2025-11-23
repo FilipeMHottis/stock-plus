@@ -1,12 +1,14 @@
 <div class="search-bar-container mb-3">
-    <form method="GET" action="{% url 'search_products' %}" class="d-flex align-items-center" role="search">
+    <form id="searchForm" method="GET" action="{% url 'search_products_sale' %}" class="d-flex align-items-center" role="search">
         <input 
-            class="form-control me-2 bg-dark text-light border-0 rounded-pill shadow-sm"
+            class="form-control me-2 bg-dark text-light border-1 rounded-pill shadow-sm"
             type="search" 
             placeholder="🔍 Buscar produto..."
             aria-label="Search" 
             name="q" 
-            value="{{ request.GET.q|default:'' }}">
+            value="{{ request.GET.q|default:'' }}"
+            autofocus
+        >
         <button class="btn btn-purple fw-bold rounded-pill px-4" type="submit">
             Pesquisar
         </button>

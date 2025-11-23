@@ -2,15 +2,122 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from ..models.payment_method import PaymentMethod
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 from ..utils.role_required import role_required
+from ..models.sale import Sale
+from django.utils.timezone import now, timedelta
 
 
 @login_required
 def report(request: HttpRequest):
     """Lista todos os métodos de pagamento."""
     methods = PaymentMethod.objects.all()
-    return render(request, "report/report.html", {"payment_methods": methods})
+    sales = Sale.objects.all()        
+
+    return render(
+        request, 
+        "report/report.html",
+        {
+            "payment_methods": methods,
+            "sales_history": sales
+        }
+    )
+
+
+@login_required
+def sales_list_api(request):
+    page = int(request.GET.get("page", 1))
+    per_page = 10
+
+    search = request.GET.get("search", "")
+    status = request.GET.get("status", "")
+    date_filter = request.GET.get("date", "")
+
+    sales = Sale.objects.select_related("customer").order_by("-date")
+
+    # 🔍 Texto
+    if search:
+        sales = sales.filter(
+            customer__name__icontains=search
+        ) | sales.filter(id__icontains=search)
+
+    # 🎯 Status
+    if status:
+        sales = sales.filter(status=status)
+
+    # 📅 Filtro de data
+    if date_filter == "today":
+        sales = sales.filter(date__date=now().date())
+    elif date_filter == "yesterday":
+        sales = sales.filter(date__date=now().date() - timedelta(days=1))
+    elif date_filter.isdigit():
+        days = int(date_filter)
+        sales = sales.filter(date__gte=now() - timedelta(days=days))
+
+    total = sales.count()
+
+    # PAGINAÇÃO
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    sales_page = sales[start:end]
+
+    results = [
+        {
+            "id": s.id,
+            "date": s.date.strftime("%d/%m/%Y %H:%M"),
+            "customer": s.customer.name,
+            "total": float(s.total_amount),
+            "status": s.status,
+        }
+        for s in sales_page
+    ]
+
+    return JsonResponse({
+        "success": True,
+        "sales": results,
+        "page": page,
+        "has_next": end < total,
+        "has_prev": page > 1,
+    })
+
+
+@login_required
+def sale_detail_api(request, sale_id):
+    """
+    Retorna os detalhes completos de uma venda em formato JSON.
+    """
+    sale = get_object_or_404(Sale, id=sale_id)
+
+    items = [
+        {
+            "product": item.product.name,
+            "qty": item.quantity,
+            "unit_price": float(item.unit_price),
+            "subtotal": float(item.subtotal),
+        }
+        for item in sale.items.all()
+    ]
+
+    data = {
+        "id": sale.id,
+        "customer": {
+            "id": sale.customer.id,
+            "name": sale.customer.name,
+            "trade_name": sale.customer.trade_name,
+            "cnpjcpf": sale.customer.cnpj_or_cpf,
+            "phone": sale.customer.phone,
+            "address": sale.customer.address,
+        },
+        "discount": float(sale.discount),
+        "total": float(sale.total_amount),
+        "status": sale.status,
+        "date": sale.date.strftime("%d/%m/%Y %H:%M"),
+        "payment_method": sale.payment_method.name if sale.payment_method else "",
+        "items": items,
+    }
+
+    return JsonResponse({"success": True, "sale": data})
 
 
 @login_required

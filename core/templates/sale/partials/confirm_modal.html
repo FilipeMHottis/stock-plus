@@ -1,0 +1,134 @@
+<div class="modal fade" id="confirmSaleModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+
+            <div class="modal-header bg-purple">
+                <h4 class="modal-title">💰 Confirmar Venda</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+
+                    <!-- 🧾 LADO ESQUERDO - NOTA FISCAL -->
+                    <div class="col-lg-6 border-end border-secondary">
+                        <h5 class="mb-3">🧾 Resumo do Pedido</h5>
+
+                        <div 
+                            id="invoice-preview" 
+                            class="p-3 rounded overflow-auto thermal-paper"
+                            style="max-height: 70vh;"
+                        >
+                            <p class="text-muted">Nada no carrinho.</p>
+                        </div>
+                    </div>
+
+                    <!-- ⚙ LADO DIREITO - CONFIRMAÇÃO -->
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">⚙️ Detalhes</h5>
+
+                        <form id="confirmSaleForm">
+
+                            <!-- Cliente -->
+                            <div class="mb-3">
+                                <label class="form-label">Cliente</label>
+                                <select id="confirm_customer" class="form-select bg-dark text-light border-secondary">
+                                    {% for c in customers %}
+                                        <option value="{{ c.id }}">{{ c.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Tipo da venda -->
+                            <div class="mb-3">
+                                <label class="form-label">Tipo da Venda</label>
+                                <select id="confirm_status" class="form-select bg-dark text-light border-secondary">
+                                    <option value="completed">Venda Agora (baixar estoque)</option>
+                                    <option value="scheduled">Agendada</option>
+                                </select>
+                            </div>
+
+                            <!-- Data agendada -->
+                            <div class="mb-3 d-none" id="confirm_scheduled_wrapper">
+                                <label class="form-label">Data Agendada</label>
+                                <input type="date" id="confirm_scheduled_date" class="form-control bg-dark text-light border-secondary">
+                            </div>
+
+                            <!-- Desconto -->
+                            <div class="mb-3">
+                                <label class="form-label">Desconto (R$)</label>
+                                <input type="number" step="0.01" min="0" id="confirm_discount" 
+                                       class="form-control bg-dark text-light border-secondary">
+                            </div>
+
+                            <!-- Pagamento -->
+                            <div class="mb-3">
+                                <label class="form-label">Método de Pagamento</label>
+                                <select id="confirm_payment" class="form-select bg-dark text-light border-secondary">
+                                    {% for p in payment_methods %}
+                                        <option value="{{ p.id }}" data-type="{{ p.type }}">{{ p.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Valor entregue se for dinheiro -->
+                            <div class="mb-3 d-none" id="money_wrapper">
+                                <label class="form-label">Valor Entregue (R$)</label>
+                                <input type="number" step="0.01" min="0" id="money_given"
+                                       class="form-control bg-dark text-light border-secondary">
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer bg-dark">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-success fw-bold" id="confirmSaleButtonModal">✔ Finalizar Venda</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 🟦 MODAL FINAL - TROCO -->
+<div class="modal fade" id="changeModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content bg-dark text-light text-center p-4">
+
+            <h4 class="mb-3">💵 Troco</h4>
+
+            <p class="fs-2 text-success">
+                R$ <strong id="changeFinalValue">0,00</strong>
+            </p>
+
+            <button class="btn btn-primary mt-3" data-bs-dismiss="modal">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .thermal-paper {
+        background: #fff8d6;
+        border: 1px solid #d1c497;
+        font-family: "Courier New", monospace;
+        color: #000;
+        box-shadow: inset 0 0 5px #00000020;
+    }
+    .thermal-title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .thermal-section {
+        border-top: 1px dashed #000;
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+</style>
