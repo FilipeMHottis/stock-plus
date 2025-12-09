@@ -43,10 +43,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-    'core',
+    'api',
 ]
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'api.User'
+
+# Rest framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,12 +112,13 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Diretórios onde o Django vai procurar arquivos estáticos
-STATICFILES_DIRS = [
-    BASE_DIR / 'core' / 'static',
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'core' / 'static',
+# ]
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'   # opcional: define pra onde o user vai depois de logar
+# Autenticação
+# LOGIN_URL = '/login/'
+# LOGIN_REDIRECT_URL = '/'   # opcional: define pra onde o user vai depois de logar
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
